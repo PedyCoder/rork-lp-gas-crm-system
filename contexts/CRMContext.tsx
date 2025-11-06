@@ -84,8 +84,33 @@ export const [CRMProvider, useCRM] = createContextHook(() => {
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.CLIENTS, JSON.stringify(newClients));
       setAllClients(newClients);
+      
+      saveToBackendStore(newClients);
     } catch (error) {
       console.error('Error saving clients:', error);
+    }
+  }, []);
+
+  const saveToBackendStore = useCallback(async (clientsToSave: Client[]) => {
+    try {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_RORK_API_BASE_URL}/api/trpc/clients.saveToStore`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          clients: clientsToSave,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to save to backend store');
+      } else {
+        const data = await response.json();
+        console.log('Saved to backend store:', data.result.data);
+      }
+    } catch (error) {
+      console.error('Error saving to backend store:', error);
     }
   }, []);
 
