@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import createContextHook from '@nkzw/create-context-hook';
 import { useCallback, useEffect, useState } from 'react';
 import { UserRole } from '@/types/client';
+import { trpcClient } from '@/lib/trpc';
 
 const STORAGE_KEY = '@crm_auth';
 
@@ -68,19 +69,17 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
 
   const login = useCallback(async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      const foundUser = MOCK_USERS.find(
-        u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-      );
+      const result = await trpcClient.users.authenticate.mutate({ email, password });
 
-      if (!foundUser) {
-        return { success: false, error: 'Correo o contraseña incorrectos' };
+      if (!result.success) {
+        return { success: false, error: result.error };
       }
 
       const authUser: AuthUser = {
-        id: foundUser.id,
-        name: foundUser.name,
-        email: foundUser.email,
-        role: foundUser.role,
+        id: result.user.id,
+        name: result.user.name,
+        email: result.user.email,
+        role: result.user.role,
       };
 
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(authUser));
