@@ -78,6 +78,8 @@ export const listPgClientsProcedure = publicProcedure
         notes: row.notes,
         assignedTo: row.assigned_to,
         area: row.area,
+        credit: row.credit,
+        creditDays: row.credit_days,
         createdAt: row.created_at,
         updatedAt: row.updated_at,
         activityHistory: row.activity_history || [],

@@ -14,6 +14,8 @@ const UpdateClientSchema = z.object({
   notes: z.string().optional(),
   assignedTo: z.string().optional(),
   area: z.string().optional(),
+  credit: z.boolean().optional(),
+  creditDays: z.number().int().nullable().optional(),
   lastVisit: z.string().nullable().optional(),
   updatedBy: z.string(),
 });
