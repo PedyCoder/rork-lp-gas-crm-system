@@ -38,6 +38,8 @@ export default function EditClientScreen() {
   const [area, setArea] = useState(AREAS[0]);
   const [hasCredit, setHasCredit] = useState(false);
   const [creditDays, setCreditDays] = useState('');
+  const [hasDiscount, setHasDiscount] = useState(false);
+  const [discountPercentage, setDiscountPercentage] = useState('');
 
   const [showTypeModal, setShowTypeModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -57,6 +59,8 @@ export default function EditClientScreen() {
       setArea(client.area);
       setHasCredit(client.hasCredit);
       setCreditDays(client.creditDays ? client.creditDays.toString() : '');
+      setHasDiscount(client.hasDiscount);
+      setDiscountPercentage(client.discountPercentage ? client.discountPercentage.toString() : '');
     }
   }, [client]);
 
@@ -101,6 +105,8 @@ export default function EditClientScreen() {
         area,
         hasCredit,
         creditDays: hasCredit && creditDays ? parseInt(creditDays, 10) : undefined,
+        hasDiscount,
+        discountPercentage: hasDiscount && discountPercentage ? parseFloat(discountPercentage) : undefined,
       });
 
       Alert.alert('Éxito', 'Cliente actualizado correctamente', [
@@ -254,6 +260,41 @@ export default function EditClientScreen() {
               placeholder="Ej: 30"
               placeholderTextColor="#94a3b8"
               keyboardType="number-pad"
+            />
+          </View>
+        )}
+
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>¿Tiene Descuento?</Text>
+          <View style={styles.creditRadioContainer}>
+            <TouchableOpacity
+              style={[styles.radioOption, !hasDiscount && styles.radioOptionSelected]}
+              onPress={() => {
+                setHasDiscount(false);
+                setDiscountPercentage('');
+              }}
+            >
+              <Text style={[styles.radioText, !hasDiscount && styles.radioTextSelected]}>No</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.radioOption, hasDiscount && styles.radioOptionSelected]}
+              onPress={() => setHasDiscount(true)}
+            >
+              <Text style={[styles.radioText, hasDiscount && styles.radioTextSelected]}>Sí</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {hasDiscount && (
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Descuento (%) *</Text>
+            <TextInput
+              style={styles.input}
+              value={discountPercentage}
+              onChangeText={setDiscountPercentage}
+              placeholder="Ej: 10"
+              placeholderTextColor="#94a3b8"
+              keyboardType="decimal-pad"
             />
           </View>
         )}
