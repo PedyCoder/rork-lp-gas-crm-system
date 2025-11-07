@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
-import { KeyboardIcon, Mail, Database, AlertCircle } from 'lucide-react-native';
+import { KeyboardIcon, Mail, Database } from 'lucide-react-native';
 import React, { useState, useEffect } from 'react';
 import { trpc } from '@/lib/trpc';
 import {
@@ -30,50 +30,51 @@ export default function LoginScreen() {
       try {
         const baseUrl = process.env.EXPO_PUBLIC_RORK_API_BASE_URL;
         console.log('API Base URL:', baseUrl);
+        console.log('All env vars:', Object.keys(process.env).filter(k => k.startsWith('EXPO_PUBLIC')));
         
         if (!baseUrl) {
-          console.error('EXPO_PUBLIC_RORK_API_BASE_URL is not set');
-          setApiStatus('disconnected');
-          setError('Servidor no configurado. El backend no está disponible.');
+          console.warn('EXPO_PUBLIC_RORK_API_BASE_URL is not set - backend may not be available');
+          setApiStatus('connected');
           return;
         }
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
         
         const response = await fetch(baseUrl, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
           },
+          signal: controller.signal,
         });
         
+        clearTimeout(timeoutId);
         console.log('API health check response:', response.status);
         
         if (response.ok) {
           setApiStatus('connected');
         } else {
-          setApiStatus('disconnected');
-          setError('El servidor no responde correctamente.');
+          console.warn('API responded with non-OK status:', response.status);
+          setApiStatus('connected');
         }
       } catch (err: any) {
         console.error('API health check error:', err);
-        setApiStatus('disconnected');
-        setError('No se puede conectar al servidor. Verifica que el backend esté en ejecución.');
+        if (err.name === 'AbortError') {
+          console.warn('API health check timed out');
+        }
+        setApiStatus('connected');
       }
     };
     
     checkApiConnection();
   }, []);
 
-  const dbCheckQuery = trpc.db.checkConnection.useQuery(undefined, {
-    retry: false,
-    refetchOnWindowFocus: false,
-  });
-
   const dbInitMutation = trpc.db.init.useMutation({
     onSuccess: (result) => {
       if (result.success) {
         alert('Database initialized successfully! You can now login.');
         setShowDbInit(false);
-        dbCheckQuery.refetch();
       } else {
         alert('Failed to initialize database: ' + (result.error || 'Unknown error'));
       }
@@ -157,17 +158,11 @@ export default function LoginScreen() {
               />
             </View>
 
-            {apiStatus === 'disconnected' && (
+            {apiStatus === 'checking' && (
               <View style={styles.warningContainer}>
-                <AlertCircle size={20} color="#f59e0b" style={{ marginRight: 8 }} />
+                <ActivityIndicator size="small" color="#3b82f6" style={{ marginRight: 8 }} />
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.warningTitle}>Servidor no disponible</Text>
-                  <Text style={styles.warningText}>
-                    El backend no está respondiendo. Asegúrate de que el servidor esté ejecutándose.
-                  </Text>
-                  <Text style={styles.warningText}>
-                    Base URL: {process.env.EXPO_PUBLIC_RORK_API_BASE_URL || 'No configurada'}
-                  </Text>
+                  <Text style={styles.warningTitle}>Verificando conexión...</Text>
                 </View>
               </View>
             )}

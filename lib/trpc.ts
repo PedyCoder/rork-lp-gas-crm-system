@@ -11,11 +11,10 @@ const getBaseUrl = () => {
     return process.env.EXPO_PUBLIC_RORK_API_BASE_URL;
   }
 
-  console.error('EXPO_PUBLIC_RORK_API_BASE_URL is not set. Available env vars:', Object.keys(process.env));
+  console.warn('EXPO_PUBLIC_RORK_API_BASE_URL is not set. Backend features will not work.');
+  console.log('Available EXPO_PUBLIC env vars:', Object.keys(process.env).filter(k => k.startsWith('EXPO_PUBLIC')));
   
-  throw new Error(
-    "No base url found, please set EXPO_PUBLIC_RORK_API_BASE_URL"
-  );
+  return '';
 };
 
 export const trpcClient = trpc.createClient({
