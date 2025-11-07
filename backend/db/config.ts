@@ -28,25 +28,25 @@ export async function query(text: string, params?: any[]) {
 
 export async function getClient() {
   const client = await pool.connect();
-  const query = client.query;
-  const release = client.release;
+  const originalQuery = client.query.bind(client);
+  const originalRelease = client.release.bind(client);
 
   const timeout = setTimeout(() => {
     console.error('A client has been checked out for more than 5 seconds!');
     console.error(`The last executed query on this client was: ${(client as any).lastQuery}`);
   }, 5000);
 
-  client.query = (...args: any[]) => {
+  (client as any).query = function(this: any, ...args: any[]): any {
     (client as any).lastQuery = args;
-    return query.apply(client, args);
+    return originalQuery.apply(this, args as never);
   };
 
-  client.release = () => {
+  client.release = (() => {
     clearTimeout(timeout);
-    client.query = query;
-    client.release = release;
-    return release.apply(client);
-  };
+    (client as any).query = originalQuery;
+    client.release = originalRelease;
+    return originalRelease();
+  }) as any;
 
   return client;
 }
