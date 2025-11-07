@@ -58,16 +58,15 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <UserPlus color={color} size={24} />,
         }}
       />
-      {isManager && (
-        <Tabs.Screen
-          name="management"
-          options={{
-            title: "Gerencia",
-            headerTitle: "Panel de Gerencia",
-            tabBarIcon: ({ color }) => <Settings color={color} size={24} />,
-          }}
-        />
-      )}
+      <Tabs.Screen
+        name="management"
+        options={{
+          title: "Gerencia",
+          headerTitle: "Panel de Gerencia",
+          tabBarIcon: ({ color }) => <Settings color={color} size={24} />,
+          href: isManager ? '/(tabs)/management' : null,
+        }}
+      />
     </Tabs>
   );
 }
