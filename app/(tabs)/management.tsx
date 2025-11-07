@@ -47,7 +47,7 @@ export default function ManagementScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>Panel de Gerencia</Text>
+          <Text style={styles.title}>Panel de Configuración</Text>
           <Text style={styles.subtitle}>Bienvenido, {user?.name}</Text>
         </View>
         <TouchableOpacity

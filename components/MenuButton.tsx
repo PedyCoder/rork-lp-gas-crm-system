@@ -62,7 +62,7 @@ export default function MenuButton() {
       show: true,
     },
     {
-      label: 'Gerencia',
+      label: 'Configuración',
       icon: <Settings color="#334155" size={20} />,
       onPress: () => {
         setIsMenuOpen(false);
