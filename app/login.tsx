@@ -1,7 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
-import { KeyboardIcon, Mail, Database } from 'lucide-react-native';
-import React, { useState } from 'react';
+import { KeyboardIcon, Mail, Database, AlertCircle } from 'lucide-react-native';
+import React, { useState, useEffect } from 'react';
 import { trpc } from '@/lib/trpc';
 import {
   ActivityIndicator,
@@ -22,7 +22,46 @@ export default function LoginScreen() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showDbInit, setShowDbInit] = useState(false);
+  const [apiStatus, setApiStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
   const { login } = useAuth();
+
+  useEffect(() => {
+    const checkApiConnection = async () => {
+      try {
+        const baseUrl = process.env.EXPO_PUBLIC_RORK_API_BASE_URL;
+        console.log('API Base URL:', baseUrl);
+        
+        if (!baseUrl) {
+          console.error('EXPO_PUBLIC_RORK_API_BASE_URL is not set');
+          setApiStatus('disconnected');
+          setError('Servidor no configurado. El backend no está disponible.');
+          return;
+        }
+        
+        const response = await fetch(baseUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
+        
+        console.log('API health check response:', response.status);
+        
+        if (response.ok) {
+          setApiStatus('connected');
+        } else {
+          setApiStatus('disconnected');
+          setError('El servidor no responde correctamente.');
+        }
+      } catch (err: any) {
+        console.error('API health check error:', err);
+        setApiStatus('disconnected');
+        setError('No se puede conectar al servidor. Verifica que el backend esté en ejecución.');
+      }
+    };
+    
+    checkApiConnection();
+  }, []);
 
   const dbCheckQuery = trpc.db.checkConnection.useQuery(undefined, {
     retry: false,
@@ -117,6 +156,21 @@ export default function LoginScreen() {
                 editable={!isLoading}
               />
             </View>
+
+            {apiStatus === 'disconnected' && (
+              <View style={styles.warningContainer}>
+                <AlertCircle size={20} color="#f59e0b" style={{ marginRight: 8 }} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.warningTitle}>Servidor no disponible</Text>
+                  <Text style={styles.warningText}>
+                    El backend no está respondiendo. Asegúrate de que el servidor esté ejecutándose.
+                  </Text>
+                  <Text style={styles.warningText}>
+                    Base URL: {process.env.EXPO_PUBLIC_RORK_API_BASE_URL || 'No configurada'}
+                  </Text>
+                </View>
+              </View>
+            )}
 
             {error ? (
               <View style={styles.errorContainer}>
@@ -311,5 +365,26 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#cbd5e1',
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+  },
+  warningContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#1e293b',
+    borderWidth: 1,
+    borderColor: '#f59e0b',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+  },
+  warningTitle: {
+    color: '#fbbf24',
+    fontSize: 14,
+    fontWeight: '600' as const,
+    marginBottom: 8,
+  },
+  warningText: {
+    color: '#cbd5e1',
+    fontSize: 12,
+    marginBottom: 4,
   },
 });

@@ -7,9 +7,12 @@ export const trpc = createTRPCReact<AppRouter>();
 
 const getBaseUrl = () => {
   if (process.env.EXPO_PUBLIC_RORK_API_BASE_URL) {
+    console.log('Using API base URL:', process.env.EXPO_PUBLIC_RORK_API_BASE_URL);
     return process.env.EXPO_PUBLIC_RORK_API_BASE_URL;
   }
 
+  console.error('EXPO_PUBLIC_RORK_API_BASE_URL is not set. Available env vars:', Object.keys(process.env));
+  
   throw new Error(
     "No base url found, please set EXPO_PUBLIC_RORK_API_BASE_URL"
   );
@@ -20,6 +23,23 @@ export const trpcClient = trpc.createClient({
     httpLink({
       url: `${getBaseUrl()}/api/trpc`,
       transformer: superjson,
+      fetch: async (input, init) => {
+        console.log('tRPC fetch request:', input);
+        try {
+          const response = await fetch(input, {
+            ...init,
+            headers: {
+              ...init?.headers,
+              'Content-Type': 'application/json',
+            },
+          });
+          console.log('tRPC fetch response status:', response.status);
+          return response;
+        } catch (error) {
+          console.error('tRPC fetch error:', error);
+          throw error;
+        }
+      },
     }),
   ],
 });

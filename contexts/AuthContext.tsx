@@ -87,9 +87,20 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(authUser));
       setUser(authUser);
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error during login:', error);
-      return { success: false, error: 'Error al iniciar sesión' };
+      
+      let errorMessage = 'Error al iniciar sesión';
+      
+      if (error?.message?.includes('fetch')) {
+        errorMessage = 'No se puede conectar al servidor. Verifica que el servidor esté en ejecución.';
+      } else if (error?.message?.includes('EXPO_PUBLIC_RORK_API_BASE_URL')) {
+        errorMessage = 'Error de configuración: URL del servidor no configurada.';
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+      return { success: false, error: errorMessage };
     }
   }, []);
 
