@@ -39,7 +39,7 @@ export default function LoginScreen() {
         }
         
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
         
         const response = await fetch(baseUrl, {
           method: 'GET',
@@ -59,9 +59,10 @@ export default function LoginScreen() {
           setApiStatus('connected');
         }
       } catch (err: any) {
-        console.error('API health check error:', err);
         if (err.name === 'AbortError') {
-          console.warn('API health check timed out');
+          console.log('API health check timed out (10s) - proceeding anyway');
+        } else {
+          console.log('API health check failed:', err.message);
         }
         setApiStatus('connected');
       }
