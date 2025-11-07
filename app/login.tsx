@@ -1,7 +1,8 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
-import { KeyboardIcon, Mail } from 'lucide-react-native';
+import { KeyboardIcon, Mail, Database } from 'lucide-react-native';
 import React, { useState } from 'react';
+import { trpc } from '@/lib/trpc';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -20,7 +21,28 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showDbInit, setShowDbInit] = useState(false);
   const { login } = useAuth();
+
+  const dbCheckQuery = trpc.db.checkConnection.useQuery(undefined, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const dbInitMutation = trpc.db.init.useMutation({
+    onSuccess: (result) => {
+      if (result.success) {
+        alert('Database initialized successfully! You can now login.');
+        setShowDbInit(false);
+        dbCheckQuery.refetch();
+      } else {
+        alert('Failed to initialize database: ' + (result.error || 'Unknown error'));
+      }
+    },
+    onError: (err) => {
+      alert('Failed to initialize database: ' + err.message);
+    },
+  });
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -37,9 +59,17 @@ export default function LoginScreen() {
       router.replace('/(tabs)');
     } else {
       setError(result.error || 'Error al iniciar sesión');
+      
+      if (result.error && result.error.includes('Database connection failed')) {
+        setShowDbInit(true);
+      }
     }
 
     setIsLoading(false);
+  };
+
+  const handleInitDatabase = () => {
+    dbInitMutation.mutate();
   };
 
   return (
@@ -88,7 +118,27 @@ export default function LoginScreen() {
               />
             </View>
 
-            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            {error ? (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{error}</Text>
+                {showDbInit && (
+                  <Pressable
+                    style={styles.dbInitButton}
+                    onPress={handleInitDatabase}
+                    disabled={dbInitMutation.isPending}
+                  >
+                    {dbInitMutation.isPending ? (
+                      <ActivityIndicator size="small" color="#3b82f6" />
+                    ) : (
+                      <>
+                        <Database size={16} color="#3b82f6" style={{ marginRight: 8 }} />
+                        <Text style={styles.dbInitButtonText}>Initialize Database</Text>
+                      </>
+                    )}
+                  </Pressable>
+                )}
+              </View>
+            ) : null}
 
             <Pressable
               style={({ pressed }) => [
@@ -208,11 +258,31 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600' as const,
   },
+  errorContainer: {
+    marginBottom: 8,
+  },
   errorText: {
     color: '#ef4444',
     fontSize: 14,
     marginBottom: 8,
     textAlign: 'center',
+  },
+  dbInitButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1e293b',
+    borderWidth: 1,
+    borderColor: '#3b82f6',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginTop: 8,
+  },
+  dbInitButtonText: {
+    color: '#3b82f6',
+    fontSize: 14,
+    fontWeight: '600' as const,
   },
   demoCredentials: {
     marginTop: 32,

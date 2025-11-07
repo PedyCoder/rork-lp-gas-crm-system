@@ -44,8 +44,8 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <AuthProvider>
           <CRMProvider>
             <GestureHandlerRootView style={{ flex: 1 }}>
@@ -53,7 +53,7 @@ export default function RootLayout() {
             </GestureHandlerRootView>
           </CRMProvider>
         </AuthProvider>
-      </QueryClientProvider>
-    </trpc.Provider>
+      </trpc.Provider>
+    </QueryClientProvider>
   );
 }

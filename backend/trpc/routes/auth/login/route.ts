@@ -14,10 +14,21 @@ export const loginProcedure = publicProcedure
     try {
       const { email, password } = input;
 
-      const result = await query(
-        'SELECT * FROM users WHERE email = $1 AND is_active = true',
-        [email]
-      );
+      console.log('Attempting database connection for login:', email);
+
+      let result;
+      try {
+        result = await query(
+          'SELECT * FROM users WHERE email = $1 AND is_active = true',
+          [email]
+        );
+      } catch (dbError: any) {
+        console.error('Database connection error:', dbError.message);
+        return {
+          success: false,
+          error: 'Database connection failed. Please ensure the database is initialized.',
+        };
+      }
 
       if (result.rows.length === 0) {
         return {
@@ -35,17 +46,21 @@ export const loginProcedure = publicProcedure
         };
       }
 
-      await query(
-        'UPDATE users SET last_login = CURRENT_TIMESTAMP, login_count = login_count + 1 WHERE id = $1',
-        [user.id]
-      );
+      try {
+        await query(
+          'UPDATE users SET last_login = CURRENT_TIMESTAMP, login_count = login_count + 1 WHERE id = $1',
+          [user.id]
+        );
 
-      const auditId = uuidv4();
-      await query(
-        `INSERT INTO audit_logs (id, user_id, action, entity_type, entity_id, created_at)
-         VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)`,
-        [auditId, user.id, 'login', 'auth', user.id]
-      );
+        const auditId = uuidv4();
+        await query(
+          `INSERT INTO audit_logs (id, user_id, action, entity_type, entity_id, created_at)
+           VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)`,
+          [auditId, user.id, 'login', 'auth', user.id]
+        );
+      } catch (auditError: any) {
+        console.error('Audit log error (non-critical):', auditError.message);
+      }
 
       return {
         success: true,
@@ -61,7 +76,7 @@ export const loginProcedure = publicProcedure
       console.error('Login error:', error);
       return {
         success: false,
-        error: 'Login failed',
+        error: error?.message || 'Login failed',
       };
     }
   });
