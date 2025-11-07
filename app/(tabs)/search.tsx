@@ -1,7 +1,7 @@
 import { useCRM } from '@/contexts/CRMContext';
 import { Client, ClientStatus, ClientType } from '@/types/client';
 import { useRouter } from 'expo-router';
-import { Search as SearchIcon, Filter, ArrowUpDown, Download, ChevronRight, X, MapPin, Phone, Mail, User, CreditCard } from 'lucide-react-native';
+import { Search as SearchIcon, Filter, ArrowUpDown, Download, ChevronRight, X, MapPin, Phone, Mail, User, CreditCard, DollarSign } from 'lucide-react-native';
 import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Modal, Pressable, Alert } from 'react-native';
 import { AREAS, SALES_REPS } from '@/constants/mockData';
@@ -309,6 +309,12 @@ export default function SearchScreen() {
                 <View style={styles.infoRow}>
                   <CreditCard color="#10b981" size={16} />
                   <Text style={[styles.infoText, styles.creditText]}>Crédito: {client.creditDays || 0} días</Text>
+                </View>
+              )}
+              {client.hasDiscount && (
+                <View style={styles.infoRow}>
+                  <DollarSign color="#f59e0b" size={16} />
+                  <Text style={[styles.infoText, styles.discountText]}>Descuento: ${client.discountAmount || 0} MXN</Text>
                 </View>
               )}
             </View>
@@ -942,6 +948,10 @@ const styles = StyleSheet.create({
   },
   creditText: {
     color: '#10b981',
+    fontWeight: '600' as const,
+  },
+  discountText: {
+    color: '#f59e0b',
     fontWeight: '600' as const,
   },
 });

@@ -36,7 +36,7 @@ export default function AddClientScreen() {
   const [hasCredit, setHasCredit] = useState(false);
   const [creditDays, setCreditDays] = useState('');
   const [hasDiscount, setHasDiscount] = useState(false);
-  const [discountPercentage, setDiscountPercentage] = useState('');
+  const [discountAmount, setDiscountAmount] = useState('');
 
   const [showTypeModal, setShowTypeModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -74,7 +74,7 @@ export default function AddClientScreen() {
         hasCredit,
         creditDays: hasCredit && creditDays ? parseInt(creditDays, 10) : undefined,
         hasDiscount,
-        discountPercentage: hasDiscount && discountPercentage ? parseFloat(discountPercentage) : undefined,
+        discountAmount: hasDiscount && discountAmount ? parseFloat(discountAmount) : undefined,
       });
 
       Alert.alert('Éxito', 'Cliente agregado correctamente', [
@@ -237,7 +237,7 @@ export default function AddClientScreen() {
               style={[styles.radioOption, !hasDiscount && styles.radioOptionSelected]}
               onPress={() => {
                 setHasDiscount(false);
-                setDiscountPercentage('');
+                setDiscountAmount('');
               }}
             >
               <Text style={[styles.radioText, !hasDiscount && styles.radioTextSelected]}>No</Text>
@@ -253,12 +253,12 @@ export default function AddClientScreen() {
 
         {hasDiscount && (
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Descuento (%) *</Text>
+            <Text style={styles.label}>Descuento (MXN) *</Text>
             <TextInput
               style={styles.input}
-              value={discountPercentage}
-              onChangeText={setDiscountPercentage}
-              placeholder="Ej: 10"
+              value={discountAmount}
+              onChangeText={setDiscountAmount}
+              placeholder="Ej: 500"
               placeholderTextColor="#94a3b8"
               keyboardType="decimal-pad"
             />

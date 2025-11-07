@@ -39,7 +39,7 @@ export default function EditClientScreen() {
   const [hasCredit, setHasCredit] = useState(false);
   const [creditDays, setCreditDays] = useState('');
   const [hasDiscount, setHasDiscount] = useState(false);
-  const [discountPercentage, setDiscountPercentage] = useState('');
+  const [discountAmount, setDiscountAmount] = useState('');
 
   const [showTypeModal, setShowTypeModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -60,7 +60,7 @@ export default function EditClientScreen() {
       setHasCredit(client.hasCredit);
       setCreditDays(client.creditDays ? client.creditDays.toString() : '');
       setHasDiscount(client.hasDiscount);
-      setDiscountPercentage(client.discountPercentage ? client.discountPercentage.toString() : '');
+      setDiscountAmount(client.discountAmount ? client.discountAmount.toString() : '');
     }
   }, [client]);
 
@@ -106,7 +106,7 @@ export default function EditClientScreen() {
         hasCredit,
         creditDays: hasCredit && creditDays ? parseInt(creditDays, 10) : undefined,
         hasDiscount,
-        discountPercentage: hasDiscount && discountPercentage ? parseFloat(discountPercentage) : undefined,
+        discountAmount: hasDiscount && discountAmount ? parseFloat(discountAmount) : undefined,
       });
 
       Alert.alert('Éxito', 'Cliente actualizado correctamente', [
@@ -271,7 +271,7 @@ export default function EditClientScreen() {
               style={[styles.radioOption, !hasDiscount && styles.radioOptionSelected]}
               onPress={() => {
                 setHasDiscount(false);
-                setDiscountPercentage('');
+                setDiscountAmount('');
               }}
             >
               <Text style={[styles.radioText, !hasDiscount && styles.radioTextSelected]}>No</Text>
@@ -287,12 +287,12 @@ export default function EditClientScreen() {
 
         {hasDiscount && (
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Descuento (%) *</Text>
+            <Text style={styles.label}>Descuento (MXN) *</Text>
             <TextInput
               style={styles.input}
-              value={discountPercentage}
-              onChangeText={setDiscountPercentage}
-              placeholder="Ej: 10"
+              value={discountAmount}
+              onChangeText={setDiscountAmount}
+              placeholder="Ej: 500"
               placeholderTextColor="#94a3b8"
               keyboardType="decimal-pad"
             />

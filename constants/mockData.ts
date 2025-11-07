@@ -48,7 +48,7 @@ export const generateMockClients = (): Client[] => {
     const hasCredit = index % 3 === 0;
     const creditDays = hasCredit ? [15, 30, 45, 60][index % 4] : undefined;
     const hasDiscount = index % 4 === 0;
-    const discountPercentage = hasDiscount ? [5, 10, 15, 20][index % 4] : undefined;
+    const discountAmount = hasDiscount ? [100, 250, 500, 1000][index % 4] : undefined;
 
     return {
       id: `client-${index + 1}`,
@@ -65,7 +65,7 @@ export const generateMockClients = (): Client[] => {
       hasCredit,
       creditDays,
       hasDiscount,
-      discountPercentage,
+      discountAmount,
       createdAt: createdDate.toISOString(),
       updatedAt: createdDate.toISOString(),
     };

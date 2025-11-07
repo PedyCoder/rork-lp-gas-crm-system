@@ -1,6 +1,6 @@
 import { useCRM } from '@/contexts/CRMContext';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
-import { MapPin, Phone, Mail, Calendar, FileText, User, ArrowLeft, Edit, Trash2, CreditCard, Percent } from 'lucide-react-native';
+import { MapPin, Phone, Mail, Calendar, FileText, User, ArrowLeft, Edit, Trash2, CreditCard, DollarSign } from 'lucide-react-native';
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 
@@ -186,12 +186,12 @@ export default function ClientDetailScreen() {
             <View style={styles.divider} />
 
             <View style={styles.infoRow}>
-              <Percent color="#64748b" size={20} />
+              <DollarSign color="#64748b" size={20} />
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Descuento</Text>
                 <Text style={styles.infoValue}>
                   {client.hasDiscount
-                    ? `Sí - ${client.discountPercentage || 0}%`
+                    ? `Sí - ${client.discountAmount || 0} MXN`
                     : 'No'}
                 </Text>
               </View>

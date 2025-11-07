@@ -26,7 +26,7 @@ export interface Client {
   hasCredit: boolean;
   creditDays?: number;
   hasDiscount: boolean;
-  discountPercentage?: number;
+  discountAmount?: number;
   activityHistory?: ActivityHistoryEntry[];
   createdAt: string;
   updatedAt: string;
