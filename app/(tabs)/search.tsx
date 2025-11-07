@@ -1,7 +1,7 @@
 import { useCRM } from '@/contexts/CRMContext';
 import { Client, ClientStatus, ClientType } from '@/types/client';
 import { useRouter } from 'expo-router';
-import { Search as SearchIcon, Filter, ArrowUpDown, Download, ChevronRight, X, MapPin, Phone, Mail, User } from 'lucide-react-native';
+import { Search as SearchIcon, Filter, ArrowUpDown, Download, ChevronRight, X, MapPin, Phone, Mail, User, CreditCard } from 'lucide-react-native';
 import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Modal, Pressable, Alert } from 'react-native';
 import { AREAS, SALES_REPS } from '@/constants/mockData';
@@ -305,6 +305,12 @@ export default function SearchScreen() {
                 <User color="#64748b" size={16} />
                 <Text style={styles.infoText}>{client.assignedTo}</Text>
               </View>
+              {client.hasCredit && (
+                <View style={styles.infoRow}>
+                  <CreditCard color="#10b981" size={16} />
+                  <Text style={[styles.infoText, styles.creditText]}>Crédito: {client.creditDays || 0} días</Text>
+                </View>
+              )}
             </View>
 
             <View style={styles.clientCardFooter}>
@@ -933,5 +939,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600' as const,
     color: '#fff',
+  },
+  creditText: {
+    color: '#10b981',
+    fontWeight: '600' as const,
   },
 });

@@ -14,6 +14,8 @@ const ClientSchema = z.object({
   notes: z.string(),
   assignedTo: z.string(),
   area: z.string(),
+  hasCredit: z.boolean(),
+  creditDays: z.number().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
   activityHistory: z.array(z.object({
@@ -67,6 +69,8 @@ export const exportExcelProcedure = publicProcedure
       'Teléfono': client.phone,
       'Email': client.email,
       'Asignado A': client.assignedTo,
+      'Tiene Crédito': client.hasCredit ? 'Sí' : 'No',
+      'Días de Crédito': client.hasCredit && client.creditDays ? client.creditDays : 'N/A',
       'Última Visita': client.lastVisit ? new Date(client.lastVisit).toLocaleDateString('es-ES') : 'N/A',
       'Notas': client.notes,
       'Fecha de Creación': new Date(client.createdAt).toLocaleDateString('es-ES'),
