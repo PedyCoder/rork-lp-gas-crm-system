@@ -1,8 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
-import { KeyboardIcon, Mail, Database } from 'lucide-react-native';
-import React, { useState, useEffect } from 'react';
-import { trpc } from '@/lib/trpc';
+import { KeyboardIcon, Mail } from 'lucide-react-native';
+import React, { useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -21,69 +20,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showDbInit, setShowDbInit] = useState(false);
-  const [apiStatus, setApiStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
   const { login } = useAuth();
-
-  useEffect(() => {
-    const checkApiConnection = async () => {
-      try {
-        const baseUrl = process.env.EXPO_PUBLIC_RORK_API_BASE_URL;
-        console.log('API Base URL:', baseUrl);
-        console.log('All env vars:', Object.keys(process.env).filter(k => k.startsWith('EXPO_PUBLIC')));
-        
-        if (!baseUrl) {
-          console.warn('EXPO_PUBLIC_RORK_API_BASE_URL is not set - backend may not be available');
-          setApiStatus('connected');
-          return;
-        }
-        
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
-        
-        const response = await fetch(baseUrl, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-          },
-          signal: controller.signal,
-        });
-        
-        clearTimeout(timeoutId);
-        console.log('API health check response:', response.status);
-        
-        if (response.ok) {
-          setApiStatus('connected');
-        } else {
-          console.warn('API responded with non-OK status:', response.status);
-          setApiStatus('connected');
-        }
-      } catch (err: any) {
-        if (err.name === 'AbortError') {
-          console.log('API health check timed out (10s) - proceeding anyway');
-        } else {
-          console.log('API health check failed:', err.message);
-        }
-        setApiStatus('connected');
-      }
-    };
-    
-    checkApiConnection();
-  }, []);
-
-  const dbInitMutation = trpc.db.init.useMutation({
-    onSuccess: (result) => {
-      if (result.success) {
-        alert('Database initialized successfully! You can now login.');
-        setShowDbInit(false);
-      } else {
-        alert('Failed to initialize database: ' + (result.error || 'Unknown error'));
-      }
-    },
-    onError: (err) => {
-      alert('Failed to initialize database: ' + err.message);
-    },
-  });
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -100,17 +37,9 @@ export default function LoginScreen() {
       router.replace('/(tabs)');
     } else {
       setError(result.error || 'Error al iniciar sesión');
-      
-      if (result.error && result.error.includes('Database connection failed')) {
-        setShowDbInit(true);
-      }
     }
 
     setIsLoading(false);
-  };
-
-  const handleInitDatabase = () => {
-    dbInitMutation.mutate();
   };
 
   return (
@@ -159,36 +88,7 @@ export default function LoginScreen() {
               />
             </View>
 
-            {apiStatus === 'checking' && (
-              <View style={styles.warningContainer}>
-                <ActivityIndicator size="small" color="#3b82f6" style={{ marginRight: 8 }} />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.warningTitle}>Verificando conexión...</Text>
-                </View>
-              </View>
-            )}
-
-            {error ? (
-              <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
-                {showDbInit && (
-                  <Pressable
-                    style={styles.dbInitButton}
-                    onPress={handleInitDatabase}
-                    disabled={dbInitMutation.isPending}
-                  >
-                    {dbInitMutation.isPending ? (
-                      <ActivityIndicator size="small" color="#3b82f6" />
-                    ) : (
-                      <>
-                        <Database size={16} color="#3b82f6" style={{ marginRight: 8 }} />
-                        <Text style={styles.dbInitButtonText}>Initialize Database</Text>
-                      </>
-                    )}
-                  </Pressable>
-                )}
-              </View>
-            ) : null}
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
             <Pressable
               style={({ pressed }) => [
@@ -308,31 +208,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600' as const,
   },
-  errorContainer: {
-    marginBottom: 8,
-  },
   errorText: {
     color: '#ef4444',
     fontSize: 14,
     marginBottom: 8,
     textAlign: 'center',
-  },
-  dbInitButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#1e293b',
-    borderWidth: 1,
-    borderColor: '#3b82f6',
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginTop: 8,
-  },
-  dbInitButtonText: {
-    color: '#3b82f6',
-    fontSize: 14,
-    fontWeight: '600' as const,
   },
   demoCredentials: {
     marginTop: 32,
@@ -361,26 +241,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#cbd5e1',
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
-  },
-  warningContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: '#1e293b',
-    borderWidth: 1,
-    borderColor: '#f59e0b',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-  },
-  warningTitle: {
-    color: '#fbbf24',
-    fontSize: 14,
-    fontWeight: '600' as const,
-    marginBottom: 8,
-  },
-  warningText: {
-    color: '#cbd5e1',
-    fontSize: 12,
-    marginBottom: 4,
   },
 });

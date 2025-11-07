@@ -23,8 +23,6 @@ export interface Client {
   notes: string;
   assignedTo: string;
   area: string;
-  credit: boolean;
-  creditDays: number | null;
   activityHistory?: ActivityHistoryEntry[];
   createdAt: string;
   updatedAt: string;
