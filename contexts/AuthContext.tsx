@@ -69,9 +69,11 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
 
   const login = useCallback(async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      const result = await trpcClient.users.authenticate.mutate({ email, password });
+      console.log('Attempting login with:', { email });
+      const result = await trpcClient.auth.login.mutate({ email, password });
+      console.log('Login result:', result);
 
-      if (!result.success) {
+      if (!result.success || !result.user) {
         return { success: false, error: result.error };
       }
 
