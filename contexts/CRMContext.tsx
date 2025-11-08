@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityHistoryEntry, Client, ClientStatus, ClientType, DashboardKPIs, Notification, Visit } from '@/types/client';
 import { generateMockClients, SALES_REPS } from '@/constants/mockData';
 import { useAuth } from './AuthContext';
-import { trpcClient } from '@/lib/trpc';
 
 const STORAGE_KEYS = {
   CLIENTS: '@crm_clients',
@@ -81,27 +80,14 @@ export const [CRMProvider, useCRM] = createContextHook(() => {
     }
   };
 
-  const saveToBackendStore = useCallback(async (clientsToSave: Client[]) => {
-    try {
-      const result = await trpcClient.clients.saveToStore.mutate({
-        clients: clientsToSave,
-      });
-      console.log('Saved to backend store:', result);
-    } catch (error) {
-      console.error('Error saving to backend store:', error);
-    }
-  }, []);
-
   const saveClients = useCallback(async (newClients: Client[]) => {
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.CLIENTS, JSON.stringify(newClients));
       setAllClients(newClients);
-      
-      saveToBackendStore(newClients);
     } catch (error) {
       console.error('Error saving clients:', error);
     }
-  }, [saveToBackendStore]);
+  }, []);
 
   const clients = useMemo(() => {
     if (!user) return [];

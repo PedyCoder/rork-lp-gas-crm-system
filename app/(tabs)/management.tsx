@@ -1,7 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useCRM } from '@/contexts/CRMContext';
 import { SALES_REPS } from '@/constants/mockData';
-import { Check, LogOut, TrendingUp, Users, UserX, ChevronRight } from 'lucide-react-native';
+import { Check, LogOut, TrendingUp, Users, UserX } from 'lucide-react-native';
 import React, { useMemo } from 'react';
 import {
   View,
@@ -47,7 +47,7 @@ export default function ManagementScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>Panel de Configuración</Text>
+          <Text style={styles.title}>Panel de Gerencia</Text>
           <Text style={styles.subtitle}>Bienvenido, {user?.name}</Text>
         </View>
         <TouchableOpacity
@@ -59,23 +59,6 @@ export default function ManagementScreen() {
           <Text style={styles.logoutText}>Salir</Text>
         </TouchableOpacity>
       </View>
-
-      <TouchableOpacity
-        style={styles.manageUsersButton}
-        onPress={() => router.push('/manage-users')}
-        activeOpacity={0.7}
-      >
-        <View style={styles.manageUsersLeft}>
-          <Users color="#3b82f6" size={22} />
-          <View>
-            <Text style={styles.manageUsersText}>Gestionar Usuarios</Text>
-            <Text style={styles.manageUsersSubtext}>
-              Crear y editar usuarios del sistema
-            </Text>
-          </View>
-        </View>
-        <ChevronRight color="#94a3b8" size={20} />
-      </TouchableOpacity>
 
       <View style={styles.summaryCard}>
         <Text style={styles.summaryTitle}>Resumen General</Text>
@@ -205,39 +188,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600' as const,
     color: '#ef4444',
-  },
-  manageUsersButton: {
-    flexDirection: 'row' as const,
-    alignItems: 'center' as const,
-    justifyContent: 'space-between',
-    backgroundColor: '#fff',
-    paddingVertical: 18,
-    paddingHorizontal: 20,
-    borderRadius: 16,
-    marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-  },
-  manageUsersLeft: {
-    flexDirection: 'row' as const,
-    alignItems: 'center' as const,
-    gap: 14,
-    flex: 1,
-  },
-  manageUsersText: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#0f172a',
-    marginBottom: 2,
-  },
-  manageUsersSubtext: {
-    fontSize: 13,
-    color: '#64748b',
   },
   summaryCard: {
     backgroundColor: '#fff',

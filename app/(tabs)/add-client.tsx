@@ -33,10 +33,6 @@ export default function AddClientScreen() {
   const [notes, setNotes] = useState('');
   const [assignedTo, setAssignedTo] = useState(SALES_REPS[0].name);
   const [area, setArea] = useState(AREAS[0]);
-  const [hasCredit, setHasCredit] = useState(false);
-  const [creditDays, setCreditDays] = useState('');
-  const [hasDiscount, setHasDiscount] = useState(false);
-  const [discountAmount, setDiscountAmount] = useState('');
 
   const [showTypeModal, setShowTypeModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -71,10 +67,6 @@ export default function AddClientScreen() {
         notes: notes.trim(),
         assignedTo,
         area,
-        hasCredit,
-        creditDays: hasCredit && creditDays ? parseInt(creditDays, 10) : undefined,
-        hasDiscount,
-        discountAmount: hasDiscount && discountAmount ? parseFloat(discountAmount) : undefined,
       });
 
       Alert.alert('Éxito', 'Cliente agregado correctamente', [
@@ -194,76 +186,6 @@ export default function AddClientScreen() {
             <ChevronDown color="#64748b" size={20} />
           </TouchableOpacity>
         </View>
-
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>¿Tiene Crédito?</Text>
-          <View style={styles.creditRadioContainer}>
-            <TouchableOpacity
-              style={[styles.radioOption, !hasCredit && styles.radioOptionSelected]}
-              onPress={() => {
-                setHasCredit(false);
-                setCreditDays('');
-              }}
-            >
-              <Text style={[styles.radioText, !hasCredit && styles.radioTextSelected]}>No</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.radioOption, hasCredit && styles.radioOptionSelected]}
-              onPress={() => setHasCredit(true)}
-            >
-              <Text style={[styles.radioText, hasCredit && styles.radioTextSelected]}>Sí</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {hasCredit && (
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Días de Crédito *</Text>
-            <TextInput
-              style={styles.input}
-              value={creditDays}
-              onChangeText={setCreditDays}
-              placeholder="Ej: 30"
-              placeholderTextColor="#94a3b8"
-              keyboardType="number-pad"
-            />
-          </View>
-        )}
-
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>¿Tiene Descuento?</Text>
-          <View style={styles.creditRadioContainer}>
-            <TouchableOpacity
-              style={[styles.radioOption, !hasDiscount && styles.radioOptionSelected]}
-              onPress={() => {
-                setHasDiscount(false);
-                setDiscountAmount('');
-              }}
-            >
-              <Text style={[styles.radioText, !hasDiscount && styles.radioTextSelected]}>No</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.radioOption, hasDiscount && styles.radioOptionSelected]}
-              onPress={() => setHasDiscount(true)}
-            >
-              <Text style={[styles.radioText, hasDiscount && styles.radioTextSelected]}>Sí</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {hasDiscount && (
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Descuento (MXN) *</Text>
-            <TextInput
-              style={styles.input}
-              value={discountAmount}
-              onChangeText={setDiscountAmount}
-              placeholder="Ej: 500"
-              placeholderTextColor="#94a3b8"
-              keyboardType="decimal-pad"
-            />
-          </View>
-        )}
 
         <View style={styles.formGroup}>
           <Text style={styles.label}>Notas</Text>
@@ -508,33 +430,6 @@ const styles = StyleSheet.create({
     color: '#475569',
   },
   modalOptionTextSelected: {
-    color: '#2563eb',
-    fontWeight: '600' as const,
-  },
-  creditRadioContainer: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  radioOption: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    backgroundColor: '#f1f5f9',
-    borderWidth: 2,
-    borderColor: '#f1f5f9',
-    alignItems: 'center',
-  },
-  radioOptionSelected: {
-    backgroundColor: '#dbeafe',
-    borderColor: '#2563eb',
-  },
-  radioText: {
-    fontSize: 16,
-    fontWeight: '500' as const,
-    color: '#64748b',
-  },
-  radioTextSelected: {
     color: '#2563eb',
     fontWeight: '600' as const,
   },

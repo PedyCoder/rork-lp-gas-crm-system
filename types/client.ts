@@ -23,10 +23,6 @@ export interface Client {
   notes: string;
   assignedTo: string;
   area: string;
-  hasCredit: boolean;
-  creditDays?: number;
-  hasDiscount: boolean;
-  discountAmount?: number;
   activityHistory?: ActivityHistoryEntry[];
   createdAt: string;
   updatedAt: string;
@@ -45,11 +41,6 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt?: string;
-  lastLogin: string | null;
-  loginCount: number;
 }
 
 export interface DashboardKPIs {

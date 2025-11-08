@@ -1,13 +1,10 @@
 import { useCRM } from '@/contexts/CRMContext';
 import { Client, ClientStatus, ClientType } from '@/types/client';
 import { useRouter } from 'expo-router';
-import { Search as SearchIcon, Filter, ArrowUpDown, Download, ChevronRight, X, MapPin, Phone, Mail, User, CreditCard, DollarSign } from 'lucide-react-native';
+import { Search as SearchIcon, Filter, SlidersHorizontal, ArrowUpDown, Download, ChevronRight, X, MapPin, Phone, Mail, User } from 'lucide-react-native';
 import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Modal, Pressable, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Modal, Pressable, Alert, Share } from 'react-native';
 import { AREAS, SALES_REPS } from '@/constants/mockData';
-
-import { downloadExcel } from '@/utils/downloadExcel';
-import { useAuth } from '@/contexts/AuthContext';
 
 const CLIENT_TYPE_LABELS: Record<ClientType, string> = {
   residential: 'Residencial',
@@ -35,7 +32,6 @@ type SortOrder = 'asc' | 'desc';
 export default function SearchScreen() {
   const router = useRouter();
   const { clients, updateClient, isLoading } = useCRM();
-  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [showSort, setShowSort] = useState(false);
@@ -46,7 +42,6 @@ export default function SearchScreen() {
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [currentPage, setCurrentPage] = useState(1);
-  const [isExporting, setIsExporting] = useState(false);
   const itemsPerPage = 10;
 
   const filteredAndSortedClients = useMemo(() => {
@@ -130,41 +125,22 @@ export default function SearchScreen() {
     searchQuery.length > 0;
 
   const exportResults = async () => {
-    if (isExporting) return;
-    
     try {
-      setIsExporting(true);
+      const csvHeader = 'Nombre,Tipo,Estado,Área,Teléfono,Email,Asignado A,Última Visita\n';
+      const csvRows = filteredAndSortedClients.map(c => 
+        `"${c.name}","${CLIENT_TYPE_LABELS[c.type]}","${STATUS_LABELS[c.status]}","${c.area}","${c.phone}","${c.email}","${c.assignedTo}","${c.lastVisit ? new Date(c.lastVisit).toLocaleDateString() : 'N/A'}"`
+      ).join('\n');
       
-      const response = await fetch(`${process.env.EXPO_PUBLIC_RORK_API_BASE_URL}/api/trpc/clients.exportExcel?input=${encodeURIComponent(JSON.stringify({
-        clients: filteredAndSortedClients,
-        exportDate: new Date().toISOString(),
-        exportedBy: user?.name || 'Usuario',
-        filters: {
-          type: selectedType !== 'all' ? selectedType : undefined,
-          status: selectedStatus !== 'all' ? selectedStatus : undefined,
-          area: selectedArea !== 'all' ? selectedArea : undefined,
-          salesRep: selectedSalesRep !== 'all' ? selectedSalesRep : undefined,
-        },
-      }))}`);
-
-      if (!response.ok) {
-        throw new Error('Failed to export');
-      }
-
-      const data = await response.json();
-      const exportData = data.result.data;
-
-      await downloadExcel(exportData.excel, exportData.filename);
+      const csvContent = csvHeader + csvRows;
+      const summary = `Resultados de búsqueda - ${filteredAndSortedClients.length} clientes\n\n${csvContent}`;
       
-      Alert.alert(
-        'Éxito', 
-        `Se exportaron ${filteredAndSortedClients.length} clientes correctamente`
-      );
+      await Share.share({
+        message: summary,
+        title: 'Exportar Clientes',
+      });
     } catch (error) {
       console.error('Error exporting:', error);
       Alert.alert('Error', 'No se pudo exportar los resultados');
-    } finally {
-      setIsExporting(false);
     }
   };
 
@@ -238,11 +214,10 @@ export default function SearchScreen() {
           </TouchableOpacity>
           {filteredAndSortedClients.length > 0 && (
             <TouchableOpacity
-              style={[styles.iconButton, isExporting && styles.iconButtonDisabled]}
+              style={styles.iconButton}
               onPress={exportResults}
-              disabled={isExporting}
             >
-              <Download color={isExporting ? "#94a3b8" : "#64748b"} size={20} />
+              <Download color="#64748b" size={20} />
             </TouchableOpacity>
           )}
         </View>
@@ -305,18 +280,6 @@ export default function SearchScreen() {
                 <User color="#64748b" size={16} />
                 <Text style={styles.infoText}>{client.assignedTo}</Text>
               </View>
-              {client.hasCredit && (
-                <View style={styles.infoRow}>
-                  <CreditCard color="#10b981" size={16} />
-                  <Text style={[styles.infoText, styles.creditText]}>Crédito: {client.creditDays || 0} días</Text>
-                </View>
-              )}
-              {client.hasDiscount && (
-                <View style={styles.infoRow}>
-                  <DollarSign color="#f59e0b" size={16} />
-                  <Text style={[styles.infoText, styles.discountText]}>Descuento: ${client.discountAmount || 0} MXN</Text>
-                </View>
-              )}
             </View>
 
             <View style={styles.clientCardFooter}>
@@ -622,10 +585,6 @@ const styles = StyleSheet.create({
   },
   iconButtonActive: {
     backgroundColor: '#2563eb',
-  },
-  iconButtonDisabled: {
-    backgroundColor: '#e2e8f0',
-    opacity: 0.6,
   },
   activeFiltersContainer: {
     flexDirection: 'row',
@@ -945,13 +904,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600' as const,
     color: '#fff',
-  },
-  creditText: {
-    color: '#10b981',
-    fontWeight: '600' as const,
-  },
-  discountText: {
-    color: '#f59e0b',
-    fontWeight: '600' as const,
   },
 });

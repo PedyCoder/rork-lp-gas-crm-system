@@ -1,9 +1,9 @@
 import { Client, User } from '@/types/client';
 
 export const SALES_REPS: User[] = [
-  { id: '1', name: 'Juan Pérez', email: 'juan@lpgas.com', role: 'sales', isActive: true, createdAt: new Date().toISOString(), lastLogin: null, loginCount: 0 },
-  { id: '2', name: 'María García', email: 'maria@lpgas.com', role: 'sales', isActive: true, createdAt: new Date().toISOString(), lastLogin: null, loginCount: 0 },
-  { id: '3', name: 'Carlos López', email: 'carlos@lpgas.com', role: 'admin', isActive: true, createdAt: new Date().toISOString(), lastLogin: null, loginCount: 0 },
+  { id: '1', name: 'Juan Pérez', email: 'juan@lpgas.com', role: 'sales' },
+  { id: '2', name: 'María García', email: 'maria@lpgas.com', role: 'sales' },
+  { id: '3', name: 'Carlos López', email: 'carlos@lpgas.com', role: 'admin' },
 ];
 
 export const AREAS = [
@@ -45,11 +45,6 @@ export const generateMockClients = (): Client[] => {
     const lastVisitDate = new Date(createdDate);
     lastVisitDate.setDate(lastVisitDate.getDate() + Math.floor(Math.random() * 30));
 
-    const hasCredit = index % 3 === 0;
-    const creditDays = hasCredit ? [15, 30, 45, 60][index % 4] : undefined;
-    const hasDiscount = index % 4 === 0;
-    const discountAmount = hasDiscount ? [100, 250, 500, 1000][index % 4] : undefined;
-
     return {
       id: `client-${index + 1}`,
       name,
@@ -62,10 +57,6 @@ export const generateMockClients = (): Client[] => {
       notes: index % 3 === 0 ? 'Cliente potencial, requiere seguimiento' : '',
       assignedTo: SALES_REPS[index % SALES_REPS.length].name,
       area: AREAS[index % AREAS.length],
-      hasCredit,
-      creditDays,
-      hasDiscount,
-      discountAmount,
       createdAt: createdDate.toISOString(),
       updatedAt: createdDate.toISOString(),
     };

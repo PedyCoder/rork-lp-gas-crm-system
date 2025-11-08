@@ -2,7 +2,6 @@ import { Tabs } from "expo-router";
 import { LayoutDashboard, Users, UserPlus, Search, Settings } from "lucide-react-native";
 import React from "react";
 import NotificationBell from "@/components/NotificationBell";
-import MenuButton from "@/components/MenuButton";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function TabLayout() {
@@ -31,7 +30,6 @@ export default function TabLayout() {
           title: "Dashboard",
           headerTitle: "CRM - LP Gas",
           tabBarIcon: ({ color }) => <LayoutDashboard color={color} size={24} />,
-          headerLeft: () => <MenuButton />,
           headerRight: () => <NotificationBell />,
         }}
       />
@@ -41,7 +39,6 @@ export default function TabLayout() {
           title: "Clientes",
           headerTitle: "Clientes",
           tabBarIcon: ({ color }) => <Users color={color} size={24} />,
-          headerLeft: () => <MenuButton />,
           headerRight: () => <NotificationBell />,
         }}
       />
@@ -51,7 +48,6 @@ export default function TabLayout() {
           title: "Buscar",
           headerTitle: "Búsqueda Avanzada",
           tabBarIcon: ({ color }) => <Search color={color} size={24} />,
-          headerLeft: () => <MenuButton />,
         }}
       />
       <Tabs.Screen
@@ -60,19 +56,18 @@ export default function TabLayout() {
           title: "Agregar",
           headerTitle: "Agregar Cliente",
           tabBarIcon: ({ color }) => <UserPlus color={color} size={24} />,
-          headerLeft: () => <MenuButton />,
         }}
       />
-      <Tabs.Screen
-        name="management"
-        options={{
-          title: "Configuración",
-          headerTitle: "Panel de Configuración",
-          tabBarIcon: ({ color }) => <Settings color={color} size={24} />,
-          headerLeft: () => <MenuButton />,
-          href: isManager ? '/(tabs)/management' : null,
-        }}
-      />
+      {isManager && (
+        <Tabs.Screen
+          name="management"
+          options={{
+            title: "Gerencia",
+            headerTitle: "Panel de Gerencia",
+            tabBarIcon: ({ color }) => <Settings color={color} size={24} />,
+          }}
+        />
+      )}
     </Tabs>
   );
 }

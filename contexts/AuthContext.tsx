@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import createContextHook from '@nkzw/create-context-hook';
 import { useCallback, useEffect, useState } from 'react';
 import { UserRole } from '@/types/client';
-import { trpcClient } from '@/lib/trpc';
 
 const STORAGE_KEY = '@crm_auth';
 
@@ -69,35 +68,26 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
 
   const login = useCallback(async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      console.log('Attempting login for:', email);
-      const result = await trpcClient.users.authenticate.mutate({ email, password });
+      const foundUser = MOCK_USERS.find(
+        u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+      );
 
-      if (!result.success) {
-        console.log('Login failed:', result.error);
-        return { success: false, error: result.error };
+      if (!foundUser) {
+        return { success: false, error: 'Correo o contraseña incorrectos' };
       }
 
       const authUser: AuthUser = {
-        id: result.user.id,
-        name: result.user.name,
-        email: result.user.email,
-        role: result.user.role,
+        id: foundUser.id,
+        name: foundUser.name,
+        email: foundUser.email,
+        role: foundUser.role,
       };
 
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(authUser));
       setUser(authUser);
-      console.log('Login successful for:', authUser.name);
       return { success: true };
     } catch (error) {
       console.error('Error during login:', error);
-      
-      if (error instanceof Error) {
-        if (error.message.includes('Load failed') || error.message.includes('fetch')) {
-          return { success: false, error: 'No se puede conectar al servidor. Verifique su conexión.' };
-        }
-        return { success: false, error: `Error: ${error.message}` };
-      }
-      
       return { success: false, error: 'Error al iniciar sesión' };
     }
   }, []);
