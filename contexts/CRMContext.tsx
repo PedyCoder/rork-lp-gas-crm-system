@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityHistoryEntry, Client, ClientStatus, ClientType, DashboardKPIs, Notification, Visit } from '@/types/client';
 import { generateMockClients, SALES_REPS } from '@/constants/mockData';
 import { useAuth } from './AuthContext';
+import { trpcClient } from '@/lib/trpc';
 
 const STORAGE_KEYS = {
   CLIENTS: '@crm_clients',
@@ -80,6 +81,17 @@ export const [CRMProvider, useCRM] = createContextHook(() => {
     }
   };
 
+  const saveToBackendStore = useCallback(async (clientsToSave: Client[]) => {
+    try {
+      const result = await trpcClient.clients.saveToStore.mutate({
+        clients: clientsToSave,
+      });
+      console.log('Saved to backend store:', result);
+    } catch (error) {
+      console.error('Error saving to backend store:', error);
+    }
+  }, []);
+
   const saveClients = useCallback(async (newClients: Client[]) => {
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.CLIENTS, JSON.stringify(newClients));
@@ -89,30 +101,7 @@ export const [CRMProvider, useCRM] = createContextHook(() => {
     } catch (error) {
       console.error('Error saving clients:', error);
     }
-  }, []);
-
-  const saveToBackendStore = useCallback(async (clientsToSave: Client[]) => {
-    try {
-      const response = await fetch(`${process.env.EXPO_PUBLIC_RORK_API_BASE_URL}/api/trpc/clients.saveToStore`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          clients: clientsToSave,
-        }),
-      });
-
-      if (!response.ok) {
-        console.error('Failed to save to backend store');
-      } else {
-        const data = await response.json();
-        console.log('Saved to backend store:', data.result.data);
-      }
-    } catch (error) {
-      console.error('Error saving to backend store:', error);
-    }
-  }, []);
+  }, [saveToBackendStore]);
 
   const clients = useMemo(() => {
     if (!user) return [];
