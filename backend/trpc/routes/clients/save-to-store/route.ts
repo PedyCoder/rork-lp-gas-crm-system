@@ -1,5 +1,6 @@
 import { publicProcedure } from "../../../create-context";
 import { z } from "zod";
+import { promises as fs } from "fs";
 
 const ClientSchema = z.object({
   id: z.string(),
@@ -48,7 +49,7 @@ export const saveToStoreProcedure = publicProcedure
     try {
       const jsonString = JSON.stringify(dataToStore, null, 2);
       const filePath = './backend/store/clients.json';
-      await Bun.write(filePath, jsonString);
+      await fs.writeFile(filePath, jsonString, 'utf-8');
 
       console.log(`✅ Saved ${clients.length} clients to store`);
 
@@ -67,9 +68,10 @@ export const loadFromStoreProcedure = publicProcedure
   .query(async () => {
     try {
       const filePath = './backend/store/clients.json';
-      const file = Bun.file(filePath);
       
-      if (!(await file.exists())) {
+      try {
+        await fs.access(filePath);
+      } catch {
         console.log('📋 No stored database found, returning empty array');
         return {
           success: false,
@@ -78,7 +80,8 @@ export const loadFromStoreProcedure = publicProcedure
         };
       }
 
-      const data = await file.json();
+      const fileContent = await fs.readFile(filePath, 'utf-8');
+      const data = JSON.parse(fileContent);
       const clients = data.clients || [];
 
       console.log(`✅ Loaded ${clients.length} clients from store`);
