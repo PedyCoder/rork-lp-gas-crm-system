@@ -1,6 +1,7 @@
 import { publicProcedure } from "../../../create-context";
 import { z } from "zod";
 import { promises as fs } from "fs";
+import path from "path";
 
 const ClientSchema = z.object({
   id: z.string(),
@@ -48,7 +49,11 @@ export const saveToStoreProcedure = publicProcedure
 
     try {
       const jsonString = JSON.stringify(dataToStore, null, 2);
-      const filePath = './backend/store/clients.json';
+      const filePath = path.join(process.cwd(), 'backend', 'store', 'clients.json');
+      
+      console.log('📝 Attempting to save to:', filePath);
+      
+      await fs.mkdir(path.dirname(filePath), { recursive: true });
       await fs.writeFile(filePath, jsonString, 'utf-8');
 
       console.log(`✅ Saved ${clients.length} clients to store`);
@@ -60,14 +65,17 @@ export const saveToStoreProcedure = publicProcedure
       };
     } catch (error) {
       console.error('❌ Error saving to store:', error);
-      throw new Error('Failed to save clients to store');
+      console.error('Error details:', error instanceof Error ? error.message : String(error));
+      throw new Error(`Failed to save clients to store: ${error instanceof Error ? error.message : String(error)}`);
     }
   });
 
 export const loadFromStoreProcedure = publicProcedure
   .query(async () => {
     try {
-      const filePath = './backend/store/clients.json';
+      const filePath = path.join(process.cwd(), 'backend', 'store', 'clients.json');
+      
+      console.log('📖 Attempting to load from:', filePath);
       
       try {
         await fs.access(filePath);
@@ -93,10 +101,11 @@ export const loadFromStoreProcedure = publicProcedure
       };
     } catch (error) {
       console.error('❌ Error loading from store:', error);
+      console.error('Error details:', error instanceof Error ? error.message : String(error));
       return {
         success: false,
         clients: [],
-        message: 'Error loading clients from store',
+        message: `Error loading clients from store: ${error instanceof Error ? error.message : String(error)}`,
       };
     }
   });
