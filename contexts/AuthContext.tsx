@@ -69,9 +69,11 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
 
   const login = useCallback(async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
+      console.log('Attempting login for:', email);
       const result = await trpcClient.users.authenticate.mutate({ email, password });
 
       if (!result.success) {
+        console.log('Login failed:', result.error);
         return { success: false, error: result.error };
       }
 
@@ -84,9 +86,18 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
 
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(authUser));
       setUser(authUser);
+      console.log('Login successful for:', authUser.name);
       return { success: true };
     } catch (error) {
       console.error('Error during login:', error);
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Load failed') || error.message.includes('fetch')) {
+          return { success: false, error: 'No se puede conectar al servidor. Verifique su conexión.' };
+        }
+        return { success: false, error: `Error: ${error.message}` };
+      }
+      
       return { success: false, error: 'Error al iniciar sesión' };
     }
   }, []);
