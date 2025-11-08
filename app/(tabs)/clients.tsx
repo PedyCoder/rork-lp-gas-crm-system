@@ -182,13 +182,17 @@ export default function ClientsScreen() {
               {client.hasCredit && (
                 <View style={styles.infoRow}>
                   <CreditCard color="#10b981" size={16} />
-                  <Text style={[styles.infoText, styles.creditText]}>Crédito: {client.creditDays || 0} días</Text>
+                  <Text style={[styles.infoText, styles.creditText]}>
+                    Crédito: {client.creditDays || 0} días
+                  </Text>
                 </View>
               )}
               {client.hasDiscount && (
                 <View style={styles.infoRow}>
                   <DollarSign color="#f59e0b" size={16} />
-                  <Text style={[styles.infoText, styles.discountText]}>Descuento: ${client.discountAmount || 0} MXN</Text>
+                  <Text style={[styles.infoText, styles.discountText]}>
+                    Descuento: ${client.discountAmount || 0} MXN
+                  </Text>
                 </View>
               )}
             </View>
