@@ -255,25 +255,6 @@ export default function UserManagementScreen() {
               </TouchableOpacity>
             </View>
 
-            {formData.role === 'sales' && (
-              <View>
-                <Text style={styles.label}>Área Asignada</Text>
-                <View style={styles.areaButtons}>
-                  {AREAS.map((area) => (
-                    <TouchableOpacity
-                      key={area}
-                      style={[styles.areaButton, formData.assignedArea === area && styles.areaButtonActive]}
-                      onPress={() => setFormData({ ...formData, assignedArea: area })}
-                    >
-                      <Text style={[styles.areaButtonText, formData.assignedArea === area && styles.areaButtonTextActive]}>
-                        {area}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-            )}
-
             <Text style={styles.label}>Contraseña Temporal *</Text>
             <View style={styles.passwordRow}>
               <TextInput
