@@ -390,36 +390,38 @@ export default function InProgressClientsScreen() {
                   <Text style={styles.checkboxLabel}>Programar recordatorio de seguimiento</Text>
                 </View>
 
-                <View style={[styles.followUpContainer, !scheduleFollowUp && { display: 'none' }]}>
-                  <Text style={styles.fieldLabel}>Días hasta el seguimiento</Text>
-                  <View style={styles.daysOptionsContainer}>
-                    {['3', '7', '14', '30'].map(days => (
-                      <TouchableOpacity
-                        key={days}
-                        style={[
-                          styles.dayOption,
-                          followUpDays === days && styles.dayOptionActive
-                        ]}
-                        onPress={() => setFollowUpDays(days)}
-                      >
-                        <Text style={[
-                          styles.dayOptionText,
-                          followUpDays === days && styles.dayOptionTextActive
-                        ]}>
-                          {days} días
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
+                {scheduleFollowUp && (
+                  <View style={styles.followUpContainer}>
+                    <Text style={styles.fieldLabel}>Días hasta el seguimiento</Text>
+                    <View style={styles.daysOptionsContainer}>
+                      {['3', '7', '14', '30'].map(days => (
+                        <TouchableOpacity
+                          key={days}
+                          style={[
+                            styles.dayOption,
+                            followUpDays === days && styles.dayOptionActive
+                          ]}
+                          onPress={() => setFollowUpDays(days)}
+                        >
+                          <Text style={[
+                            styles.dayOptionText,
+                            followUpDays === days && styles.dayOptionTextActive
+                          ]}>
+                            {days} días
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                    <TextInput
+                      style={styles.customDaysInput}
+                      placeholder="O ingresa un número personalizado"
+                      value={followUpDays}
+                      onChangeText={setFollowUpDays}
+                      keyboardType="number-pad"
+                      placeholderTextColor="#94a3b8"
+                    />
                   </View>
-                  <TextInput
-                    style={styles.customDaysInput}
-                    placeholder="O ingresa un número personalizado"
-                    value={followUpDays}
-                    onChangeText={setFollowUpDays}
-                    keyboardType="number-pad"
-                    placeholderTextColor="#94a3b8"
-                  />
-                </View>
+                )}
               </ScrollView>
 
               <View style={styles.modalActions}>
