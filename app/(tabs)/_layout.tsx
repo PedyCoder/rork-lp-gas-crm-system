@@ -67,8 +67,8 @@ export default function TabLayout() {
         <Tabs.Screen
           name="management"
           options={{
-            title: "Gerencia",
-            headerTitle: "Panel de Gerencia",
+            title: "Configuración",
+            headerTitle: "Configuración",
             tabBarIcon: ({ color }) => <Settings color={color} size={24} />,
             headerLeft: () => <NavigationMenu />,
           }}
