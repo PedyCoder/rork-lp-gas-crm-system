@@ -17,22 +17,20 @@ function RootLayoutNav() {
     return null;
   }
 
-  if (!isAuthenticated) {
-    return (
-      <Stack screenOptions={{ headerBackTitle: "Atrás" }}>
-        <Stack.Screen name="login" options={{ headerShown: false }} />
-      </Stack>
-    );
-  }
-
   return (
     <Stack screenOptions={{ headerBackTitle: "Atrás" }}>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="client/[id]" options={{ headerShown: true }} />
-      <Stack.Screen name="edit-client/[id]" options={{ headerShown: true }} />
-      <Stack.Screen name="in-progress-clients" options={{ headerShown: true }} />
-      <Stack.Screen name="closed-clients" options={{ headerShown: true }} />
-      <Stack.Screen name="monthly-visits" options={{ headerShown: true }} />
+      {!isAuthenticated ? (
+        <Stack.Screen name="login" options={{ headerShown: false }} />
+      ) : (
+        <>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="client/[id]" options={{ headerShown: true }} />
+          <Stack.Screen name="edit-client/[id]" options={{ headerShown: true }} />
+          <Stack.Screen name="in-progress-clients" options={{ headerShown: true }} />
+          <Stack.Screen name="closed-clients" options={{ headerShown: true }} />
+          <Stack.Screen name="monthly-visits" options={{ headerShown: true }} />
+        </>
+      )}
     </Stack>
   );
 }
