@@ -41,6 +41,10 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  assignedArea?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  lastActive?: string;
 }
 
 export interface DashboardKPIs {
