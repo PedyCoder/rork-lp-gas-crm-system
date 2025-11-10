@@ -113,8 +113,6 @@ export default function SalesRepsScreen() {
           );
         })}
       </View>
-
-
     </ScrollView>
   );
 }
