@@ -1,6 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { useCRM } from '@/contexts/CRMContext';
-import { Check, Users, UserX } from 'lucide-react-native';
+import { Check, Users, UserCheck, MapPin } from 'lucide-react-native';
 import React, { useMemo } from 'react';
 import {
   View,
@@ -12,12 +11,21 @@ import {
 
 export default function SalesRepsScreen() {
   const { switchViewToSalesRep, viewingAsUser, getAllUsers } = useAuth();
-  const { dashboardKPIs } = useCRM();
 
   const allUsers = useMemo(() => getAllUsers(), [getAllUsers]);
   const salesReps = useMemo(() => {
-    return allUsers.filter(rep => rep.role === 'sales');
+    return allUsers.filter(rep => rep.role === 'sales' && rep.isActive);
   }, [allUsers]);
+
+  const repsByMunicipio = useMemo(() => {
+    const grouped = new Map<string, number>();
+    salesReps.forEach(rep => {
+      if (rep.assignedArea) {
+        grouped.set(rep.assignedArea, (grouped.get(rep.assignedArea) || 0) + 1);
+      }
+    });
+    return Array.from(grouped.entries()).sort((a, b) => b[1] - a[1]);
+  }, [salesReps]);
 
   const handleSwitchView = (repId: string | null) => {
     switchViewToSalesRep(repId);
@@ -26,50 +34,44 @@ export default function SalesRepsScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.summaryCard}>
-        <Text style={styles.summaryTitle}>Resumen de Desempeño</Text>
+        <Text style={styles.summaryTitle}>Cuentas Activas de Vendedores</Text>
         <View style={styles.summaryGrid}>
-          <View style={styles.summaryItem}>
-            <Users color="#2563eb" size={24} />
-            <Text style={styles.summaryValue}>{dashboardKPIs.totalClients}</Text>
-            <Text style={styles.summaryLabel}>Total Clientes</Text>
-          </View>
-          <View style={styles.summaryItem}>
-            <Users color="#10b981" size={24} />
-            <Text style={styles.summaryValue}>{dashboardKPIs.clientsInProgress}</Text>
-            <Text style={styles.summaryLabel}>En Progreso</Text>
+          <View style={styles.summaryItemLarge}>
+            <View style={styles.summaryIconLarge}>
+              <UserCheck color="#3b82f6" size={32} />
+            </View>
+            <View style={styles.summaryContent}>
+              <Text style={styles.summaryValueLarge}>{salesReps.length}</Text>
+              <Text style={styles.summaryLabelLarge}>Vendedores Activos</Text>
+            </View>
           </View>
         </View>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Vista de Vendedores</Text>
-        <Text style={styles.sectionDescription}>
-          Seleccione un vendedor para ver sus datos o seleccione "Ver Todos" para ver todos los clientes
-        </Text>
-
-        <TouchableOpacity
-          style={[
-            styles.repCard,
-            !viewingAsUser && styles.repCardActive,
-          ]}
-          onPress={() => handleSwitchView(null)}
-          activeOpacity={0.7}
-        >
-          <View style={styles.repCardLeft}>
-            <View style={[styles.repIcon, { backgroundColor: '#8b5cf6' }]}>
-              <Users color="#fff" size={20} />
-            </View>
-            <View>
-              <Text style={styles.repName}>Ver Todos</Text>
-              <Text style={styles.repEmail}>Acceso completo a todos los datos</Text>
-            </View>
+      {repsByMunicipio.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Distribución por Municipio</Text>
+          <View style={styles.municipioGrid}>
+            {repsByMunicipio.map(([municipio, count]) => (
+              <View key={municipio} style={styles.municipioCard}>
+                <View style={styles.municipioIcon}>
+                  <MapPin color="#8b5cf6" size={20} />
+                </View>
+                <View style={styles.municipioContent}>
+                  <Text style={styles.municipioCount}>{count}</Text>
+                  <Text style={styles.municipioName}>{municipio}</Text>
+                </View>
+              </View>
+            ))}
           </View>
-          {!viewingAsUser && (
-            <View style={styles.checkIcon}>
-              <Check color="#10b981" size={20} />
-            </View>
-          )}
-        </TouchableOpacity>
+        </View>
+      )}
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Perfiles de Vendedores</Text>
+        <Text style={styles.sectionDescription}>
+          Ver perfil y detalles de cada vendedor activo
+        </Text>
 
         {salesReps.map(rep => {
           const isActive = viewingAsUser === rep.id;
@@ -85,33 +87,34 @@ export default function SalesRepsScreen() {
             >
               <View style={styles.repCardLeft}>
                 <View style={[styles.repIcon, { backgroundColor: '#3b82f6' }]}>
-                  <UserX color="#fff" size={20} />
+                  <UserCheck color="#fff" size={20} />
                 </View>
-                <View>
+                <View style={styles.repInfo}>
                   <Text style={styles.repName}>{rep.name}</Text>
                   <Text style={styles.repEmail}>{rep.email}</Text>
                   {rep.assignedArea && (
-                    <Text style={styles.repArea}>Área: {rep.assignedArea}</Text>
+                    <View style={styles.repAreaBadge}>
+                      <MapPin color="#8b5cf6" size={12} />
+                      <Text style={styles.repArea}>{rep.assignedArea}</Text>
+                    </View>
+                  )}
+                  {rep.lastActive && (
+                    <Text style={styles.repLastActive}>
+                      Última actividad: {new Date(rep.lastActive).toLocaleDateString('es-MX', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
+                    </Text>
                   )}
                 </View>
               </View>
-              {isActive && (
-                <View style={styles.checkIcon}>
-                  <Check color="#10b981" size={20} />
-                </View>
-              )}
             </TouchableOpacity>
           );
         })}
       </View>
 
-      {viewingAsUser && (
-        <View style={styles.activeViewBanner}>
-          <Text style={styles.activeViewText}>
-            Viendo datos de: {salesReps.find(r => r.id === viewingAsUser)?.name}
-          </Text>
-        </View>
-      )}
+
     </ScrollView>
   );
 }
@@ -137,32 +140,84 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   summaryTitle: {
-    fontSize: 18,
-    fontWeight: '600' as const,
+    fontSize: 20,
+    fontWeight: '700' as const,
     color: '#0f172a',
     marginBottom: 16,
   },
   summaryGrid: {
     flexDirection: 'row',
+  },
+  summaryItemLarge: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#eff6ff',
+    borderRadius: 16,
     gap: 16,
   },
-  summaryItem: {
-    flex: 1,
+  summaryIconLarge: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    backgroundColor: '#dbeafe',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#f8fafc',
-    borderRadius: 12,
+    justifyContent: 'center',
   },
-  summaryValue: {
-    fontSize: 32,
+  summaryContent: {
+    flex: 1,
+  },
+  summaryValueLarge: {
+    fontSize: 40,
+    fontWeight: '700' as const,
+    color: '#1e40af',
+    marginBottom: 4,
+  },
+  summaryLabelLarge: {
+    fontSize: 15,
+    color: '#3b82f6',
+    fontWeight: '600' as const,
+  },
+  municipioGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  municipioCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    minWidth: '47%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  municipioIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: '#f5f3ff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  municipioContent: {
+    flex: 1,
+  },
+  municipioCount: {
+    fontSize: 24,
     fontWeight: '700' as const,
     color: '#0f172a',
-    marginTop: 8,
   },
-  summaryLabel: {
+  municipioName: {
     fontSize: 12,
     color: '#64748b',
-    marginTop: 4,
+    marginTop: 2,
   },
   section: {
     backgroundColor: '#fff',
@@ -191,15 +246,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#fff',
     borderRadius: 12,
     marginBottom: 12,
-    borderWidth: 2,
-    borderColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
   },
   repCardActive: {
-    backgroundColor: '#eff6ff',
-    borderColor: '#3b82f6',
+    backgroundColor: '#fff',
+    borderColor: '#e2e8f0',
   },
   repCardLeft: {
     flexDirection: 'row',
@@ -208,47 +268,46 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   repIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  repInfo: {
+    flex: 1,
   },
   repName: {
     fontSize: 16,
     fontWeight: '600' as const,
     color: '#0f172a',
+    marginBottom: 4,
   },
   repEmail: {
     fontSize: 13,
     color: '#64748b',
-    marginTop: 2,
+    marginBottom: 6,
+  },
+  repAreaBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#f5f3ff',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+    marginBottom: 4,
   },
   repArea: {
     fontSize: 12,
     color: '#8b5cf6',
-    marginTop: 2,
-    fontWeight: '500' as const,
-  },
-  checkIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#d1fae5',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  activeViewBanner: {
-    backgroundColor: '#dbeafe',
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 24,
-    borderLeftWidth: 4,
-    borderLeftColor: '#3b82f6',
-  },
-  activeViewText: {
-    fontSize: 14,
     fontWeight: '600' as const,
-    color: '#1e40af',
   },
+  repLastActive: {
+    fontSize: 11,
+    color: '#94a3b8',
+    marginTop: 2,
+  },
+
 });
