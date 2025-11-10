@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, Pressable, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Menu, X, LayoutDashboard, Search, Users, Calendar, Settings, LogOut } from 'lucide-react-native';
+import { Menu, X, LayoutDashboard, Search, Users, Calendar, Settings, LogOut, UserPlus } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function NavigationMenu() {
@@ -24,6 +24,7 @@ export default function NavigationMenu() {
     { label: 'Dashboard', icon: LayoutDashboard, path: '/(tabs)/', visible: true },
     { label: 'Búsqueda', icon: Search, path: '/(tabs)/search', visible: true },
     { label: 'Clientes', icon: Users, path: '/(tabs)/clients', visible: true },
+    { label: 'Agregar Cliente', icon: UserPlus, path: '/(tabs)/add-client', visible: true },
     { label: 'Visitas', icon: Calendar, path: '/monthly-visits', visible: true },
     { label: 'Configuración', icon: Settings, path: '/(tabs)/management', visible: isManager },
   ];
