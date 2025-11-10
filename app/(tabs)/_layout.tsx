@@ -63,17 +63,16 @@ export default function TabLayout() {
           headerLeft: () => <NavigationMenu />,
         }}
       />
-      {isManager && (
-        <Tabs.Screen
-          name="management"
-          options={{
-            title: "Configuración",
-            headerTitle: "Configuración",
-            tabBarIcon: ({ color }) => <Settings color={color} size={24} />,
-            headerLeft: () => <NavigationMenu />,
-          }}
-        />
-      )}
+      <Tabs.Screen
+        name="management"
+        options={{
+          title: "Configuración",
+          headerTitle: "Configuración",
+          tabBarIcon: ({ color }) => <Settings color={color} size={24} />,
+          headerLeft: () => <NavigationMenu />,
+          href: isManager ? '/management' : null,
+        }}
+      />
     </Tabs>
   );
 }
