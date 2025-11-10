@@ -29,6 +29,7 @@ function RootLayoutNav() {
           <Stack.Screen name="in-progress-clients" options={{ headerShown: true }} />
           <Stack.Screen name="closed-clients" options={{ headerShown: true }} />
           <Stack.Screen name="monthly-visits" options={{ headerShown: true }} />
+          <Stack.Screen name="config" options={{ headerShown: false }} />
         </>
       )}
     </Stack>
