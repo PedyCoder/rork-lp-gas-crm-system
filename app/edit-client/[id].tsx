@@ -229,19 +229,6 @@ export default function EditClientScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Notas</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            value={notes}
-            onChangeText={setNotes}
-            placeholder="Información adicional sobre el cliente..."
-            placeholderTextColor="#94a3b8"
-            multiline
-            numberOfLines={4}
-          />
-        </View>
-
         <Text style={styles.sectionTitle}>Condiciones Comerciales</Text>
 
         <View style={styles.formGroup}>
@@ -308,6 +295,19 @@ export default function EditClientScreen() {
               />
             </View>
           )}
+        </View>
+
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Notas</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            value={notes}
+            onChangeText={setNotes}
+            placeholder="Información adicional sobre el cliente..."
+            placeholderTextColor="#94a3b8"
+            multiline
+            numberOfLines={4}
+          />
         </View>
       </ScrollView>
 
