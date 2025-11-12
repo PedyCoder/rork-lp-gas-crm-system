@@ -24,6 +24,10 @@ export interface Client {
   assignedTo: string;
   area: string;
   activityHistory?: ActivityHistoryEntry[];
+  hasCredit: boolean;
+  creditDays?: number;
+  hasDiscount: boolean;
+  discountAmount?: number;
   createdAt: string;
   updatedAt: string;
 }

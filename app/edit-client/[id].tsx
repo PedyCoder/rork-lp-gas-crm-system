@@ -36,6 +36,10 @@ export default function EditClientScreen() {
   const [notes, setNotes] = useState('');
   const [assignedTo, setAssignedTo] = useState(SALES_REPS[0].name);
   const [area, setArea] = useState(AREAS[0]);
+  const [hasCredit, setHasCredit] = useState(false);
+  const [creditDays, setCreditDays] = useState('');
+  const [hasDiscount, setHasDiscount] = useState(false);
+  const [discountAmount, setDiscountAmount] = useState('');
 
   const [showTypeModal, setShowTypeModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -53,6 +57,10 @@ export default function EditClientScreen() {
       setNotes(client.notes);
       setAssignedTo(client.assignedTo);
       setArea(client.area);
+      setHasCredit(client.hasCredit);
+      setCreditDays(client.creditDays ? client.creditDays.toString() : '');
+      setHasDiscount(client.hasDiscount);
+      setDiscountAmount(client.discountAmount ? client.discountAmount.toString() : '');
     }
   }, [client]);
 
@@ -95,6 +103,10 @@ export default function EditClientScreen() {
         notes: notes.trim(),
         assignedTo,
         area,
+        hasCredit,
+        creditDays: hasCredit && creditDays ? parseInt(creditDays, 10) : undefined,
+        hasDiscount,
+        discountAmount: hasDiscount && discountAmount ? parseFloat(discountAmount) : undefined,
       });
 
       Alert.alert('Éxito', 'Cliente actualizado correctamente', [
@@ -228,6 +240,74 @@ export default function EditClientScreen() {
             multiline
             numberOfLines={4}
           />
+        </View>
+
+        <Text style={styles.sectionTitle}>Condiciones Comerciales</Text>
+
+        <View style={styles.formGroup}>
+          <View style={styles.toggleRow}>
+            <View style={styles.toggleLabel}>
+              <Text style={styles.label}>Crédito</Text>
+              <Text style={styles.helperText}>¿El cliente tiene crédito?</Text>
+            </View>
+            <TouchableOpacity
+              style={[styles.toggle, hasCredit && styles.toggleActive]}
+              onPress={() => {
+                setHasCredit(!hasCredit);
+                if (hasCredit) setCreditDays('');
+              }}
+            >
+              <Text style={[styles.toggleText, hasCredit && styles.toggleTextActive]}>
+                {hasCredit ? 'Sí' : 'No'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {hasCredit && (
+            <View style={styles.conditionalField}>
+              <Text style={styles.label}>Días de Crédito</Text>
+              <TextInput
+                style={styles.input}
+                value={creditDays}
+                onChangeText={setCreditDays}
+                placeholder="Ej: 30"
+                placeholderTextColor="#94a3b8"
+                keyboardType="numeric"
+              />
+            </View>
+          )}
+        </View>
+
+        <View style={styles.formGroup}>
+          <View style={styles.toggleRow}>
+            <View style={styles.toggleLabel}>
+              <Text style={styles.label}>Descuento</Text>
+              <Text style={styles.helperText}>¿El cliente tiene descuento?</Text>
+            </View>
+            <TouchableOpacity
+              style={[styles.toggle, hasDiscount && styles.toggleActive]}
+              onPress={() => {
+                setHasDiscount(!hasDiscount);
+                if (hasDiscount) setDiscountAmount('');
+              }}
+            >
+              <Text style={[styles.toggleText, hasDiscount && styles.toggleTextActive]}>
+                {hasDiscount ? 'Sí' : 'No'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {hasDiscount && (
+            <View style={styles.conditionalField}>
+              <Text style={styles.label}>Descuento (MXN)</Text>
+              <TextInput
+                style={styles.input}
+                value={discountAmount}
+                onChangeText={setDiscountAmount}
+                placeholder="Ej: 150.00"
+                placeholderTextColor="#94a3b8"
+                keyboardType="decimal-pad"
+              />
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -484,5 +564,44 @@ const styles = StyleSheet.create({
   modalOptionTextSelected: {
     color: '#2563eb',
     fontWeight: '600' as const,
+  },
+  toggleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  toggleLabel: {
+    flex: 1,
+  },
+  helperText: {
+    fontSize: 12,
+    color: '#94a3b8',
+    marginTop: 2,
+  },
+  toggle: {
+    backgroundColor: '#e2e8f0',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 8,
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  toggleActive: {
+    backgroundColor: '#2563eb',
+  },
+  toggleText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: '#64748b',
+  },
+  toggleTextActive: {
+    color: '#fff',
+  },
+  conditionalField: {
+    marginTop: 12,
+    paddingLeft: 16,
+    borderLeftWidth: 3,
+    borderLeftColor: '#2563eb',
   },
 });

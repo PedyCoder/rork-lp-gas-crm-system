@@ -181,6 +181,37 @@ export default function ClientDetailScreen() {
           </View>
         )}
 
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Condiciones Comerciales</Text>
+          <View style={styles.infoCard}>
+            <View style={styles.infoRow}>
+              <FileText color="#64748b" size={20} />
+              <View style={styles.infoContent}>
+                <Text style={styles.infoLabel}>Crédito</Text>
+                <Text style={styles.infoValue}>
+                  {client.hasCredit
+                    ? `Sí - ${client.creditDays || 0} días`
+                    : 'No'}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.infoRow}>
+              <FileText color="#64748b" size={20} />
+              <View style={styles.infoContent}>
+                <Text style={styles.infoLabel}>Descuento</Text>
+                <Text style={styles.infoValue}>
+                  {client.hasDiscount
+                    ? `${client.discountAmount?.toFixed(2) || '0.00'} MXN`
+                    : 'No'}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
         {client.activityHistory && client.activityHistory.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Historial de Actividad</Text>

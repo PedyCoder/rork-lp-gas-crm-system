@@ -45,6 +45,9 @@ export const generateMockClients = (): Client[] => {
     const lastVisitDate = new Date(createdDate);
     lastVisitDate.setDate(lastVisitDate.getDate() + Math.floor(Math.random() * 30));
 
+    const hasCredit = index % 3 === 0;
+    const hasDiscount = index % 4 === 0;
+
     return {
       id: `client-${index + 1}`,
       name,
@@ -57,6 +60,10 @@ export const generateMockClients = (): Client[] => {
       notes: index % 3 === 0 ? 'Cliente potencial, requiere seguimiento' : '',
       assignedTo: SALES_REPS[index % SALES_REPS.length].name,
       area: AREAS[index % AREAS.length],
+      hasCredit,
+      creditDays: hasCredit ? [15, 30, 45, 60][index % 4] : undefined,
+      hasDiscount,
+      discountAmount: hasDiscount ? [50, 100, 150, 200][index % 4] : undefined,
       createdAt: createdDate.toISOString(),
       updatedAt: createdDate.toISOString(),
     };
