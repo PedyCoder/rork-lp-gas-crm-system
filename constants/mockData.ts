@@ -48,6 +48,7 @@ export const generateMockClients = (): Client[] => {
     const hasCredit = index % 3 === 0;
     const hasDiscount = index % 4 === 0;
 
+    const createdBy = SALES_REPS[index % SALES_REPS.length].name;
     return {
       id: `client-${index + 1}`,
       name,
@@ -58,12 +59,13 @@ export const generateMockClients = (): Client[] => {
       lastVisit: statuses[index % statuses.length] === 'new' ? null : lastVisitDate.toISOString(),
       status: statuses[index % statuses.length],
       notes: index % 3 === 0 ? 'Cliente potencial, requiere seguimiento' : '',
-      assignedTo: SALES_REPS[index % SALES_REPS.length].name,
+      assignedTo: createdBy,
       area: AREAS[index % AREAS.length],
       hasCredit,
       creditDays: hasCredit ? [15, 30, 45, 60][index % 4] : undefined,
       hasDiscount,
       discountAmount: hasDiscount ? [50, 100, 150, 200][index % 4] : undefined,
+      createdBy,
       createdAt: createdDate.toISOString(),
       updatedAt: createdDate.toISOString(),
     };

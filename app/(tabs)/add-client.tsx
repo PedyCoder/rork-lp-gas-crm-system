@@ -31,7 +31,6 @@ export default function AddClientScreen() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<ClientStatus>('new');
   const [notes, setNotes] = useState('');
-  const [assignedTo, setAssignedTo] = useState(SALES_REPS[0].name);
   const [area, setArea] = useState(AREAS[0]);
   const [hasCredit, setHasCredit] = useState(false);
   const [creditDays, setCreditDays] = useState('');
@@ -40,7 +39,6 @@ export default function AddClientScreen() {
 
   const [showTypeModal, setShowTypeModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
-  const [showAssignedToModal, setShowAssignedToModal] = useState(false);
   const [showAreaModal, setShowAreaModal] = useState(false);
 
   const handleSubmit = async () => {
@@ -69,7 +67,7 @@ export default function AddClientScreen() {
         lastVisit: null,
         status,
         notes: notes.trim(),
-        assignedTo,
+        assignedTo: '',
         area,
         hasCredit,
         creditDays: hasCredit && creditDays ? parseInt(creditDays, 10) : undefined,
@@ -184,16 +182,7 @@ export default function AddClientScreen() {
           </View>
         </View>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Asignado a *</Text>
-          <TouchableOpacity
-            style={styles.selectInput}
-            onPress={() => setShowAssignedToModal(true)}
-          >
-            <Text style={styles.selectInputText}>{assignedTo}</Text>
-            <ChevronDown color="#64748b" size={20} />
-          </TouchableOpacity>
-        </View>
+
 
         <Text style={styles.sectionTitle}>Condiciones Comerciales</Text>
 
@@ -330,27 +319,7 @@ export default function AddClientScreen() {
         </Pressable>
       </Modal>
 
-      <Modal visible={showAssignedToModal} animationType="slide" transparent onRequestClose={() => setShowAssignedToModal(false)}>
-        <Pressable style={styles.modalOverlay} onPress={() => setShowAssignedToModal(false)}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Asignar a</Text>
-            {SALES_REPS.map(rep => (
-              <TouchableOpacity
-                key={rep.id}
-                style={[styles.modalOption, assignedTo === rep.name && styles.modalOptionSelected]}
-                onPress={() => {
-                  setAssignedTo(rep.name);
-                  setShowAssignedToModal(false);
-                }}
-              >
-                <Text style={[styles.modalOptionText, assignedTo === rep.name && styles.modalOptionTextSelected]}>
-                  {rep.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </Pressable>
-      </Modal>
+
 
       <Modal visible={showAreaModal} animationType="slide" transparent onRequestClose={() => setShowAreaModal(false)}>
         <Pressable style={styles.modalOverlay} onPress={() => setShowAreaModal(false)}>

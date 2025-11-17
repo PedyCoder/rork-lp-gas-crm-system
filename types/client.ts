@@ -28,6 +28,7 @@ export interface Client {
   creditDays?: number;
   hasDiscount: boolean;
   discountAmount?: number;
+  createdBy: string;
   createdAt: string;
   updatedAt: string;
 }
