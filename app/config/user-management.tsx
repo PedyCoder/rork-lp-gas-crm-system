@@ -164,7 +164,7 @@ export default function UserManagementScreen() {
                   <View style={styles.userMetaRow}>
                     <Text style={styles.userRole}>{u.role === 'admin' ? 'Gerente' : 'Vendedor'}</Text>
                     {u.assignedArea && (
-                      <Text style={styles.userArea}> • {u.assignedArea}</Text>
+                      <Text style={styles.userArea}>• {u.assignedArea}</Text>
                     )}
                   </View>
                   {u.lastActive && (
