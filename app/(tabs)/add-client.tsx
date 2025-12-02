@@ -67,7 +67,6 @@ export default function AddClientScreen() {
         lastVisit: null,
         status,
         notes: notes.trim(),
-        assignedTo: '',
         area,
         hasCredit,
         creditDays: hasCredit && creditDays ? parseInt(creditDays, 10) : undefined,

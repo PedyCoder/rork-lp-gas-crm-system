@@ -106,13 +106,14 @@ export const [CRMProvider, useCRM] = createContextHook(() => {
     return allClients.filter(c => c.assignedTo === user.name);
   }, [allClients, user, isManager, getEffectiveUserId]);
 
-  const addClient = useCallback(async (client: Omit<Client, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>) => {
+  const addClient = useCallback(async (client: Omit<Client, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'assignedTo'> & { assignedTo?: string }) => {
     const createdBy = user?.name || 'Unknown';
+    const assignedTo = client.assignedTo || createdBy;
     const newClient: Client = {
       ...client,
       id: `client-${Date.now()}`,
       createdBy,
-      assignedTo: createdBy,
+      assignedTo,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
