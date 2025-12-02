@@ -115,7 +115,7 @@ export default function EditClientScreen() {
           onPress: () => router.back(),
         },
       ]);
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'No se pudo actualizar el cliente');
     }
   };

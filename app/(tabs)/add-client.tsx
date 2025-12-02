@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { ChevronDown } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Modal, Pressable, Alert } from 'react-native';
-import { SALES_REPS, AREAS } from '@/constants/mockData';
+import { AREAS } from '@/constants/mockData';
 
 const CLIENT_TYPE_OPTIONS: { value: ClientType; label: string }[] = [
   { value: 'residential', label: 'Residencial' },
@@ -80,7 +80,7 @@ export default function AddClientScreen() {
           onPress: () => router.back(),
         },
       ]);
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'No se pudo agregar el cliente');
     }
   };
@@ -180,8 +180,6 @@ export default function AddClientScreen() {
             </TouchableOpacity>
           </View>
         </View>
-
-
 
         <Text style={styles.sectionTitle}>Condiciones Comerciales</Text>
 
@@ -317,8 +315,6 @@ export default function AddClientScreen() {
           </View>
         </Pressable>
       </Modal>
-
-
 
       <Modal visible={showAreaModal} animationType="slide" transparent onRequestClose={() => setShowAreaModal(false)}>
         <Pressable style={styles.modalOverlay} onPress={() => setShowAreaModal(false)}>
