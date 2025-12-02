@@ -55,14 +55,18 @@ export default function DashboardScreen() {
       </View>
 
       <View style={styles.kpiGrid}>
-        <View style={[styles.kpiCard, styles.primaryCard]}>
+        <TouchableOpacity 
+          style={[styles.kpiCard, styles.primaryCard]}
+          onPress={() => router.push('/(tabs)/clients')}
+          activeOpacity={0.7}
+        >
           <View style={styles.kpiIconContainer}>
             <Users color="#fff" size={24} />
           </View>
           <Text style={styles.kpiValue}>{kpis.totalClients}</Text>
           <Text style={styles.kpiLabel}>Total Clientes</Text>
           <Text style={styles.kpiSubtext}>+{kpis.newClientsThisMonth} este mes</Text>
-        </View>
+        </TouchableOpacity>
 
         <TouchableOpacity 
           style={[styles.kpiCard, styles.warningCard]}
